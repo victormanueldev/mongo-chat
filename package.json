@@ -1,0 +1,24 @@
+{
+  "name": "mongochat",
+  "version": "1.0.0",
+  "description": "Chat with MongoDB & Nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "mongochat"
+  },
+  "keywords": [
+    "chat"
+  ],
+  "author": "Victor Manuel",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "mongodb": "^3.2.2",
+    "socket.io": "^2.2.0"
+  }
+}

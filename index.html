@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat Mongo</title>
+    <style>
+        #messages{
+            height: 300px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 col-sm-12">
+                <h1 class="text-center">
+                    Chat Mongo
+                    <button id="clear" class="btn btn-danger">Clear</button>
+                </h1>
+
+                <div id="status"></div>
+                <div id="chat">
+                    <input type="text" id="name" class="form-control" placeholder="Ingrese el nombre...">
+                    <br>
+                    <div class="card">
+                        <div id="messages" class="card-block">
+
+                        </div>
+                    </div>
+                    <br>
+                    <textarea  id="textarea" class="form-control" placeholder="Escriba el mensaje" ></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script>
+        (function(){
+
+            //Conectar con Socket
+            var socket = io.connect('http://localhost:4000')
+
+            var element = function(id){
+                return document.getElementById(id)
+            }
+
+            //Obtener elementos 
+            var status = element('status')
+            var messages = element('messages')
+            var name = element('name')
+            var textarea = element('textarea')
+            var clearBtn = element('clear')
+
+            //Estado por defecto
+            var statusDefault = status.textContent
+
+            var setStatus = function(s){
+
+                //Cambia el estado
+                status.textContent = s
+
+                if(s !== statusDefault){
+                    var delay = setTimeout(function(){
+                        setStatus(statusDefault)
+                    }, 4000)
+                }
+
+            }
+            
+
+            if(socket !== undefined){
+                console.log('Connected to socket...')
+
+                //Conectar al canal de salida
+                socket.on('output', function(data){
+                    if(data.length){
+                        for (let index = 0; index < data.length; index++) {
+                            var message = document.createElement('div')
+                            message.setAttribute('class', 'chat-message')
+                            message.textContent = data[index].name+": "+data[index].message
+                            messages.appendChild(message)
+                            messages.insertBefore(message, messages.firstChild)
+                        }
+                    }
+                })
+
+                //Obtener el estado de la comunicacion
+                socket.on('status', function(data){
+                    //Cambiar el estado
+                    setStatus((typeof data == 'object') ? data.message : data)
+                    if(data.clear){
+                        textarea.value = ''
+                    }
+                })
+
+                //Evento de envio de mensaje
+                textarea.addEventListener('keydown', function(event){
+                    if(event.which == 13 && event.shiftKey == false){
+                        //Emitir el evento input al servidor
+                        socket.emit('input', {
+                            name: name.value,
+                            message: textarea.value
+                        })
+                        event.preventDefault()
+                    }
+                })
+
+                
+            }
+        })()
+    </script>
+</body>
+</html>
