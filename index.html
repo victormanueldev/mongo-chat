@@ -109,6 +109,13 @@
                     }
                 })
 
+                clearBtn.addEventListener('click', function(){
+                    socket.emit('clear')
+                })
+
+                socket.on('cleared', function(){
+                    messages.textContent = ''
+                })
                 
             }
         })()

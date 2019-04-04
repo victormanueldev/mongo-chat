@@ -46,7 +46,6 @@ server.listen(4000, function() {
 
             //Canal para eventos de entrada
             socket.on('input', function (data) {
-                console.log("INPUT")
                 let name = data.name
                 let message = data.message
 
@@ -67,8 +66,9 @@ server.listen(4000, function() {
                 }
             })
 
+            //Canal para limpiar todos los mensajes
             socket.on('clear', function (data) {
-                chat.remove({}, function () {
+                chat.deleteMany({}, function () {
                     socket.emit('cleared')
                 })
             })
