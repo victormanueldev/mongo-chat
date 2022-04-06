@@ -71,14 +71,15 @@
 
             }
             
-
             if(socket !== undefined){
                 console.log('Connected to socket...')
 
-                //Conectar al canal de salida
+                //Escucha al canal por el que se envian todos los mensajes
                 socket.on('output', function(data){
+                    messages.innerHTML = ''
                     if(data.length){
                         for (let index = 0; index < data.length; index++) {
+                            // A#nade los mensajes recibidos al HTML
                             var message = document.createElement('div')
                             message.setAttribute('class', 'chat-message')
                             message.textContent = data[index].name+": "+data[index].message
@@ -88,7 +89,7 @@
                     }
                 })
 
-                //Obtener el estado de la comunicacion
+                //Escucha el canal que envia el estado de la comunicacion
                 socket.on('status', function(data){
                     //Cambiar el estado
                     setStatus((typeof data == 'object') ? data.message : data)
@@ -109,10 +110,12 @@
                     }
                 })
 
+                // Evento de click en el boton de limpiar mensajes
                 clearBtn.addEventListener('click', function(){
                     socket.emit('clear')
                 })
 
+                // Escucha el canal de limpieza de mensajes
                 socket.on('cleared', function(){
                     messages.textContent = ''
                 })
